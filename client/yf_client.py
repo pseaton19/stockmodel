@@ -12,5 +12,20 @@ class YahooFinanceClient:
 
 if __name__ == "__main__":
     client = YahooFinanceClient()
-    stock_data = client.load_stock_data(stock_symbols=['AAPL'], period="1d")
+    stock_data = client.load_stock_data(
+        stock_symbols=['AAPL'], period="max")
     print(stock_data)
+    percent_diffs = [stock_data]
+    for period in [30, 90, 365, 730]:
+        percent_change = stock_data.pct_change(periods=period)['Close']
+        percent_change_df = percent_change.to_frame().rename(
+            columns={'Close': f'{period} days percent close'}
+        )
+        percent_diffs.append(percent_change_df)
+
+    overall_data = pd.concat(percent_diffs, axis=1)
+    overall_data.to_csv()
+    print(overall_data)
+
+    # Code to merge the data
+    # df = pd.concat([pd.read_csv(file) for file in files], ignore_index=True)
